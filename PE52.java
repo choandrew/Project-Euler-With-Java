@@ -9,6 +9,21 @@ import java.util.Arrays;
 					
 
 public class PE52 {
+
+
+/*
+* the reason I will be checking up to 10 ** (digits + 1)/6, which
+* is equal to 1 followed by 6s (aka 16, 166, 1666, 16666) is
+* because 6x needs to have the same number of digits as x
+* so for example x = 167 would not work because 167 * 6 = 1001
+* has one more digits
+* 
+* the strategy for this problem is making a sorted array of the
+* every number and its multiples and checking to see if they are
+* equal
+*
+* if all 6 arrays are equal, then we have the number
+*/
 	public static void main(String[] args) {
 		boolean foundnumber = false;
 		byte digits = 1;
@@ -31,7 +46,7 @@ public class PE52 {
 
 
 
-				if (PE52.checkarray(a,b) == true && PE52.checkarray(a,c) == true && PE52.checkarray(a,d) == true && PE52.checkarray(a,e) == true && PE52.checkarray(a,f) == true) {
+				if (Arrays.equals(a,b) == true && Arrays.equals(a,c) == true && Arrays.equals(a,d) == true && Arrays.equals(a,e) == true && Arrays.equals(a,f) == true) {
 					System.out.println("the answer is " + i);
 					foundnumber = true;
 				}
@@ -41,7 +56,10 @@ public class PE52 {
 	}	
 
 
-
+/**
+*makearray is  the process that puts the digits of an input
+*number into an array
+*/
 	public static byte[] makearray(int number) {
 		byte[] array;
 		int dummy = number;
@@ -60,13 +78,5 @@ public class PE52 {
 		return array;
 	}
 
-	public static boolean checkarray(byte[] array1, byte[] array2) {
-		for (byte digitofnumber : array1) {
-			if (Arrays.equals(array1, array2) == false) {
-				return false;
-			}
-		}
-		return true; 
-		
-	}	
+	
 }
