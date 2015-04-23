@@ -2,6 +2,8 @@ The files in this repo are my solutions to various problems in Project Euler
 
 https://projecteuler.net/
 
+I think PE247.java is particularly clever, although it is not the cleanest solution.
+
 Project Euler is a series of challenging mathematical/computer
 programming problems that will require more than just mathematical
 insights to solve. Although mathematics will help you arrive at elegant
