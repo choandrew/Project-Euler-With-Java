@@ -7,7 +7,7 @@
  *
  *
  *
- * the code is admittedly pretty messy, but it is organized
+ * the code is admittedly a bit hacked together, but it is organized
  *
  * this code fundamentally does the following:
  * 1. each square is identified with an array of 7 doubles with
@@ -25,7 +25,6 @@
  *    is like a "manhattan distance" to the point (3,3) from the origin
  *
  * the output answer turns out to be 782252
- * unfortunately, it takes around 5 minutes to output
  */
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PE247 implements Comparator<double[]> {
+public class PE247{
 
 
 
@@ -51,11 +50,14 @@ public class PE247 implements Comparator<double[]> {
 		ArrayList<double[]> moves_in_order = new ArrayList<double[]>();
 		ArrayList<double[]> has_correct_index = new ArrayList<double[]>();
 		
-		Comparator<double[]> comparator = new PE247();
+		// as PQSort (the class implementing comparator) is a nested class, the program must create an instance of the outer class
+		PE247 instance = new PE247();
+		Comparator<double[]> comparator = instance.new PQSort();
+		
+		
+		
 		PriorityQueue<double[]> possible_next_moves = new PriorityQueue<double[]>(10, comparator);
 		
-		
-
 
 
 		double[] initial_move = {1,0};
@@ -65,18 +67,19 @@ public class PE247 implements Comparator<double[]> {
 
 		while (has_correct_index.size() < 20) {
 			determine_possible_next_moves(moves_in_order, possible_next_moves);
-				
-			if (possible_next_moves.peek()[5] == 3.0 && possible_next_moves.peek()[6] == 3.0) {
-				System.out.println((moves_in_order.size()+1) + " has index of (3,3): " + Arrays.toString(possible_next_moves.peek()));
+			
+			// only checks [6] (aka the y_index), because the y-index can only be nonzero if the x-index is 3, as seen in the
+			// move_maker method
+			if (possible_next_moves.peek()[6] == 3.0) {
+				System.out.println("Square number " + (moves_in_order.size()+1) + " has index of (3,3)");
 				has_correct_index.add(possible_next_moves.peek());
 			}			
-			// System.out.println(moves_in_order.size()+1 + " has: " + Arrays.toString(possible_next_moves.peek()));
 			moves_in_order.add(possible_next_moves.poll());
 
 		}
 		
 
-		System.out.println("This is the answer: " + Arrays.toString(has_correct_index.get(has_correct_index.size()-1)));
+		System.out.println("The answer is square number: " + (moves_in_order.size()+1));
 	}
 
 	/*
@@ -85,6 +88,9 @@ public class PE247 implements Comparator<double[]> {
 	 * another 2 possible moves will be created 
 	 * these moves are added to the priority queue possible_next_moves
 	 */
+	
+	
+	
 	public static void determine_possible_next_moves(ArrayList<double[]> moves_in_order, PriorityQueue<double[]> possible_next_moves) {
 		double[] lastmove = moves_in_order.get(moves_in_order.size()-1);		
 		
@@ -109,8 +115,8 @@ public class PE247 implements Comparator<double[]> {
 	 * will be produced
 	 * [0] = bottom left x coordinate
 	 * [1] = bottom left y coordinat(calculated with quadratic formula)
-	 * [3] = top right x coordinate (calculated by reciprocal of [2])
-	 * [3] = top right y coordinate
+	 * [2] = top right x coordinate
+	 * [3] = top right y coordinate (reciprocal of [2])
 	 * [4] = area of square
 	 * [5] = x index
 	 * [6] = y index
@@ -125,13 +131,21 @@ public class PE247 implements Comparator<double[]> {
 		possible_move[3] = 1.0/(possible_move[2]);
 		possible_move[4] = Math.pow(possible_move[2]-possible_move[0],2) ;
 		possible_move[5] = PE247.x_index(moves_in_order, possible_move[1]);
-		possible_move[6] = PE247.y_index(moves_in_order, possible_move[0]);
+		
+
+		// only calculates y-index if x-index is 3, because we only care if both are 3	
+		if (possible_move[5] == 3) {
+			possible_move[6] = PE247.y_index(moves_in_order, possible_move[0]);
+		} else {
+			possible_move[6] = 0;
+		}
 
 
 		return possible_move;
 	}
 
-	// calculates x index
+	// returns 3 if the x index is 3
+	// otherwise, returns 0
 	 
 	public static double x_index(ArrayList<double[]> moves_in_order, double BL_y_coordinate) {
 		/*
@@ -142,14 +156,22 @@ public class PE247 implements Comparator<double[]> {
 
 		double x_index = 0;
 		for(double[] moves : moves_in_order) {
+			if (x_index >= 4.0) {
+				return 0;
+			}
 			if (moves[1] <= BL_y_coordinate && BL_y_coordinate < moves[3]) {
 				x_index++;
 			}	
 		}
-		return x_index;
+		if (x_index == 3.0) {
+			return x_index;
+		} else {
+			return 0;
+		}
 	}
 
-	// calculates y index
+	// returns 3 if the y index is 3
+	// otherwise, returns 0
 	public static double y_index(ArrayList<double[]> moves_in_order, double BL_x_coordinate) {
 		/*
 		 * y_index should really be an int, but the array it's in is filled with doubles
@@ -157,29 +179,37 @@ public class PE247 implements Comparator<double[]> {
 		 */
 		double y_index = 0;
 		for(double[] moves : moves_in_order) {
+			if (y_index >= 4.0) {
+				return 0;
+			}
 			if (moves[0] <= BL_x_coordinate && BL_x_coordinate < moves[2]) {
 				y_index++;
 			}
 		}
-		return y_index;
+		if (y_index == 3.0) {
+			return y_index;
+		} else {
+			return y_index;
+		}
 	}
 
 
-//very helpful for this: http://stackoverflow.com/questions/683041/java-how-do-i-use-a-priorityqueue
- 
-	@Override
-	public int compare(double[] x, double[] y) {
-	
-		if (x[4] > y[4]) {
-			return -1;
-		}
 
-		if (x[4] < y[4]) {
-			return 1;
-		}
+       public class PQSort implements Comparator<double[]> {
+		@Override
+		public int compare(double[] x, double[] y) {
+		
+			if (x[4] > y[4]) {
+				return -1;
+			}
+
+			if (x[4] < y[4]) {
+				return 1;
+			}
 
 		return 0;
 		
-	}
+		}
+       }
 
 }
