@@ -6,8 +6,6 @@ class gcd {
 /* I implemented the Binary GCD algorithm. I got the C code from:
  * http://en.wikipedia.org/wiki/Binary_GCD_algorithm
  * used the iterative version, and transcribed it to java
- * unfortunately, this has a worst case O(n^2), which means that using it too many times
- * will make the calculation time huge
  */
 	public static long gcd(long u, long v) {
 		
